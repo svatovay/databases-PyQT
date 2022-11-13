@@ -1,0 +1,4 @@
+2022-10-16 16:55:07,297   CRITICAL   server_log_config.py      Test critical event
+2022-10-16 16:55:07,297   ERROR      server_log_config.py      Test error event
+2022-10-16 16:55:07,297   DEBUG      server_log_config.py      Test debug event
+2022-10-16 16:55:07,297   INFO       server_log_config.py      Test info event

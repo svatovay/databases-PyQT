@@ -20,16 +20,56 @@ def host_ping(hosts_list: list) -> None:
             print(f'Узел {host} недоступен')
 
 
-def host_range_ping():
-    pass
+def host_range_ping(hosts_list: list, hosts_range: int) -> None:
+    param = "-n" if platform.system().lower() == 'windows' else "-c"
+    for host in hosts_list:
+        try:
+            main_chunk = host.split('.')[:3]
+            start = _ - 1 if (_ := int(*host.split('.')[-1:])) > 0 else _
+            subnet = list(ipaddress.ip_network(f'{".".join(main_chunk)}.0/24').hosts())
+            for i, subnet_host in enumerate(subnet[start:]):
+                if i == hosts_range:
+                    break
+                command = ['ping', param, '1', subnet_host.exploded]
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process.communicate()
+                if process.returncode == 0:
+                    print(f'Узел {subnet_host} доступен')
+                else:
+                    print(f'Узел {subnet_host} недоступен')
+            else:
+                print('Запрашиваемый диапазон превышает допустимые условия: требуется изменение предпоследнего октета')
+        except ValueError:
+            pass
 
 
-def host_range_ping_tab():
-    pass
+def host_range_ping_tab(hosts_list: list, hosts_range: int) -> None:
+    param = "-n" if platform.system().lower() == 'windows' else "-c"
+    reachable = []
+    unreachable = []
+    for host in hosts_list:
+        try:
+            main_chunk = host.split('.')[:3]
+            start = _ - 1 if (_ := int(*host.split('.')[-1:])) > 0 else _
+            subnet = list(ipaddress.ip_network(f'{".".join(main_chunk)}.0/24').hosts())
+            for i, subnet_host in enumerate(subnet[start:]):
+                if i == hosts_range:
+                    break
+                command = ['ping', param, '1', subnet_host.exploded]
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process.communicate()
+                if process.returncode == 0:
+                    reachable.append(subnet_host.exploded)
+                else:
+                    unreachable.append(subnet_host.exploded)
+            else:
+                print('Запрашиваемый диапазон превышает допустимые условия: требуется изменение предпоследнего октета')
+        except ValueError:
+            pass
 
 
 if __name__ == '__main__':
     hosts = ['192.168.0.1', '192.168.0.8', '127.0.0.1', '0.0.0.0', 'yandex.ru', 'rutracker.org', ]
-    host_ping(hosts)
-    # host_range_ping()
-    # host_range_ping_tab()
+    # host_ping(hosts)
+    # host_range_ping(hosts, 3)
+    host_range_ping_tab(hosts, 3)

@@ -1,7 +1,7 @@
 import ipaddress
 import platform
 import subprocess
-import chardet
+import tabulate
 
 
 def host_ping(hosts_list: list) -> None:
@@ -45,9 +45,11 @@ def host_range_ping(hosts_list: list, hosts_range: int) -> None:
 
 def host_range_ping_tab(hosts_list: list, hosts_range: int) -> None:
     param = "-n" if platform.system().lower() == 'windows' else "-c"
-    reachable = []
-    unreachable = []
     for host in hosts_list:
+        tested_hosts = {
+            'reachable': [],
+            'unreachable': [],
+        }
         try:
             main_chunk = host.split('.')[:3]
             start = _ - 1 if (_ := int(*host.split('.')[-1:])) > 0 else _
@@ -59,11 +61,12 @@ def host_range_ping_tab(hosts_list: list, hosts_range: int) -> None:
                 process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 process.communicate()
                 if process.returncode == 0:
-                    reachable.append(subnet_host.exploded)
+                    tested_hosts['reachable'].append(subnet_host.exploded)
                 else:
-                    unreachable.append(subnet_host.exploded)
+                    tested_hosts['unreachable'].append(subnet_host.exploded)
             else:
                 print('Запрашиваемый диапазон превышает допустимые условия: требуется изменение предпоследнего октета')
+            print(tabulate.tabulate(tested_hosts, headers='keys', tablefmt='grid'))
         except ValueError:
             pass
 

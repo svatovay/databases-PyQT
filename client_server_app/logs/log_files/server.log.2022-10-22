@@ -1,0 +1,6 @@
+2022-10-22 11:38:53,725   CRITICAL   server_log_config.py      Test critical event
+2022-10-22 11:38:53,725   ERROR      server_log_config.py      Test error event
+2022-10-22 11:38:53,725   DEBUG      server_log_config.py      Test debug event
+2022-10-22 11:38:53,725   INFO       server_log_config.py      Test info event2022-10-22 11:58:09,165   DEBUG      server.py                 Функция main вызвана из функции <module> в модуле server.py с аргументами: (); {}
+2022-10-22 11:58:14,433   INFO       server.py                 CLIENT MESSAGE: {'action': 'presence', 'time': 1666421894.4330494, 'user': {'account_name': 'Guest'}}
+2022-10-22 11:58:14,433   DEBUG      server.py                 Функция process_client_message вызвана из функции main в модуле server.py с аргументами: ({'action': 'presence', 'time': 1666421894.4330494, 'user': {'account_name': 'Guest'}},); {}

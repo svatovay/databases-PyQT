@@ -73,6 +73,6 @@ def host_range_ping_tab(hosts_list: list, hosts_range: int) -> None:
 
 if __name__ == '__main__':
     hosts = ['192.168.0.1', '192.168.0.8', '127.0.0.1', '0.0.0.0', 'yandex.ru', 'rutracker.org', ]
-    # host_ping(hosts)
-    # host_range_ping(hosts, 3)
+    host_ping(hosts)
+    host_range_ping(hosts, 3)
     host_range_ping_tab(hosts, 3)

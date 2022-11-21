@@ -13,7 +13,22 @@ from common.utils import get_message, send_message
 from common.decos import Log
 
 
+class PortChecker:
+
+    def __get__(self, instance, instance_type):
+        return instance.__dict__[self.my_attr]
+
+    def __set__(self, instance, value):
+        if not (value >= 0 and isinstance(value, int)):
+            raise ValueError("Номер порта должен быть целочиселлным и >= 0")
+        instance.__dict__[self.my_attr] = value
+
+    def __set_name__(self, owner, my_attr):
+        self.my_attr = my_attr
+
+
 class ServerVerifier(type):
+
     def __init__(cls, *args, **kwargs):
         check = False
         for key, value in cls.__dict__.items():
@@ -30,8 +45,11 @@ class ServerVerifier(type):
 
 
 class Server(metaclass=ServerVerifier):
+    listen_port = PortChecker()
+
     # Инициализация логирования сервера.
-    def __init__(self):
+    def __init__(self, listen_port):
+        self.listen_port = listen_port
         self.LOGGER = logging.getLogger('server_dist')
 
     def process_client_message(self, message, messages_list, client, clients, names):
@@ -104,20 +122,20 @@ class Server(metaclass=ServerVerifier):
     def arg_parser(self):
         """Парсер аргументов коммандной строки"""
         parser = argparse.ArgumentParser()
-        parser.add_argument('-p', default=DEFAULT_PORT, type=int, nargs='?')
+        parser.add_argument('-p', default=self.listen_port, type=int, nargs='?')
         parser.add_argument('-a', default='', nargs='?')
         namespace = parser.parse_args(sys.argv[1:])
         listen_address = namespace.a
-        listen_port = namespace.p
+        self.listen_port = namespace.p
 
         # проверка получения корректного номера порта для работы сервера.
-        if not 1023 < listen_port < 65536:
+        if not 1023 < self.listen_port < 65536:
             self.LOGGER.critical(
-                f'Попытка запуска сервера с указанием неподходящего порта {listen_port}. '
+                f'Попытка запуска сервера с указанием неподходящего порта {self.listen_port}. '
                 f'Допустимы адреса с 1024 до 65535.')
             sys.exit(1)
 
-        return listen_address, listen_port
+        return listen_address, self.listen_port
 
     def main(self):
         """
@@ -189,5 +207,5 @@ class Server(metaclass=ServerVerifier):
 
 
 if __name__ == '__main__':
-    server = Server()
+    server = Server(DEFAULT_PORT)
     server.main()

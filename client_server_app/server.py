@@ -1,3 +1,4 @@
+import dis
 import select
 import sys
 import socket
@@ -13,7 +14,19 @@ from common.decos import Log
 
 
 class ServerVerifier(type):
-    pass
+    def __init__(cls, *args, **kwargs):
+        check = False
+        for key, value in cls.__dict__.items():
+            try:
+                ret = dis.get_instructions(value)
+            except TypeError:
+                pass
+            else:
+                for i in ret:
+                    if i.opname == 'LOAD_METHOD' and i.argval == 'connect':
+                        raise Exception('Don`t use socket.accept & socket.listen in a client app')
+                    if i.opname == 'LOAD_ATTR' and i.argval == 'SOCK_DGRAM':
+                        raise Exception('Don`t use socket.SOCK_DGRAM  to TCP connect')
 
 
 class Server(metaclass=ServerVerifier):

@@ -1,31 +1,31 @@
+import sys
+sys.path.append('../')
+from client import create_presence, process_response_ans
+from common.variables import *
 import unittest
-from client import create_presence, process_ans
+from errors import ReqFieldMissingError, ServerError
 
 
-class TestCreatePresenceFunction(unittest.TestCase):
-    def setUp(self) -> None:
-        pass
+# Класс с тестами
+class TestClass(unittest.TestCase):
+    # тест коректного запроса
+    def test_def_presense(self):
+        test = create_presence('Guest')
+        test[TIME] = 1.1  # время необходимо приравнять принудительно иначе тест никогда не будет пройден
+        self.assertEqual(test, {ACTION: PRESENCE, TIME: 1.1, USER: {ACCOUNT_NAME: 'Guest'}})
 
-    def tearDown(self) -> None:
-        pass
+    # тест корректтного разбора ответа 200
+    def test_200_ans(self):
+        self.assertEqual(process_response_ans({RESPONSE: 200}), '200 : OK')
 
-    def test_dict_keys(self):
-        self.assertEqual(tuple(create_presence('Ivan').keys()), ('action', 'time', 'user'))
+    # тест корректного разбора 400
+    def test_400_ans(self):
+        self.assertRaises(ServerError, process_response_ans , {RESPONSE: 400, ERROR: 'Bad Request'})
 
-    def test_action(self):
-        self.assertEqual(create_presence('Ivan')['action'], 'presence')
-
-    def test_account_name(self):
-        self.assertEqual(create_presence('Ivan')['user']['account_name'], 'Ivan')
+    # тест исключения без поля RESPONSE
+    def test_no_response(self):
+        self.assertRaises(ReqFieldMissingError, process_response_ans, {ERROR: 'Bad Request'})
 
 
-class TestProcessAnsFunction(unittest.TestCase):
-    def setUp(self) -> None:
-        pass
-
-    def tearDown(self) -> None:
-        pass
-
-    def test_raise_value_error(self):
-        with self.assertRaises(ValueError):
-            process_ans('test_message')
+if __name__ == '__main__':
+    unittest.main()

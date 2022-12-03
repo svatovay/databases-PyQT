@@ -31,7 +31,7 @@ def main():
             break
         elif action == 's':
             # Запускаем сервер!
-            process.append(get_subprocess("server.py"))
+            process.append(get_subprocess("server_main.py"))
         elif action == 'k':
             print('Убедитесь, что на сервере зарегистрировано необходимо количество клиентов с паролем 123456.')
             print('Первый запуск может быть достаточно долгим из-за генерации ключей!')
